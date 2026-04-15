@@ -295,12 +295,7 @@ if "journal_idx" not in st.session_state:
 if "breath_running" not in st.session_state:
     st.session_state.breath_running = False
 
-# ── DEMO CREDENTIALS ─────────────────────────────────────────────────────────
-DEMO_USERS = {
-    "demo":    {"password": "mindease123",  "name": "Demo User",    "avatar": "🧑"},
-    "student": {"password": "student@2024", "name": "Student User", "avatar": "🎓"},
-    "admin":   {"password": "admin@mind",   "name": "Admin",        "avatar": "🛡️"},
-}
+# ── DEMO CREDENTIALS (open access — any non-empty input works) ────────────────
 
 # ── LOGIN PAGE ────────────────────────────────────────────────────────────────
 if not st.session_state.logged_in:
@@ -384,15 +379,14 @@ if not st.session_state.logged_in:
     st.markdown('<div class="login-logo">🧠 MindEase</div>', unsafe_allow_html=True)
     st.markdown('<div class="login-sub">Your AI Mental Wellness Companion<br/>Sign in to continue your journey 💜</div>', unsafe_allow_html=True)
 
-    # Demo credentials hint
+    # Open-access hint
     st.markdown("""
     <div style="background:rgba(124,106,247,0.08);border:1px solid rgba(124,106,247,0.2);
          border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.2rem;font-size:0.8rem">
-        <strong style="color:#a89cf8">🎓 Demo Credentials</strong><br/>
-        <div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.3rem">
-            <span style="color:rgba(240,238,255,0.7)">👤 Username: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">demo</code> &nbsp; Password: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">mindease123</code></span>
-            <span style="color:rgba(240,238,255,0.7)">🎓 Username: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">student</code> &nbsp; Password: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">student@2024</code></span>
-        </div>
+        <strong style="color:#a89cf8">🎓 Demo Access</strong><br/>
+        <span style="color:rgba(240,238,255,0.65);margin-top:0.4rem;display:block">
+            Enter <strong>any name</strong> and <strong>any password</strong> to sign in.
+        </span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -414,27 +408,28 @@ if not st.session_state.logged_in:
     if st.session_state.login_error:
         st.markdown(f'<div class="login-error">⚠️ {st.session_state.login_error}</div>', unsafe_allow_html=True)
 
-    # Login button
+    # Login button — accepts any non-empty input
     if st.button("Sign In →", key="login_btn", use_container_width=True):
-        uname = username.strip().lower()
-        if uname in DEMO_USERS and DEMO_USERS[uname]["password"] == password:
+        uname = username.strip()
+        pwd   = password.strip()
+        if not uname:
+            st.session_state.login_error = "Please enter a name to continue."
+            st.rerun()
+        elif not pwd:
+            st.session_state.login_error = "Please enter a password to continue."
+            st.rerun()
+        else:
+            display_name = uname.capitalize()
             st.session_state.logged_in = True
-            st.session_state.logged_in_user = DEMO_USERS[uname]["name"]
+            st.session_state.logged_in_user = display_name
             st.session_state.login_error = ""
-            # Personalize first message
             st.session_state.messages = [
                 {
                     "role": "assistant",
-                    "content": f"Welcome back, **{DEMO_USERS[uname]['name']}** {DEMO_USERS[uname]['avatar']} 💜\n\nI'm **Elara**, your AI mental wellness companion. This is a **safe, confidential space** for you.\n\n*How are you feeling today?*",
+                    "content": f"Welcome, **{display_name}** 🧑 💜\n\nI'm **Elara**, your AI mental wellness companion. This is a **safe, confidential space** for you.\n\n*How are you feeling today?*",
                     "time": datetime.now().strftime("%I:%M %p")
                 }
             ]
-            st.rerun()
-        elif not uname:
-            st.session_state.login_error = "Please enter a username."
-            st.rerun()
-        else:
-            st.session_state.login_error = "Invalid username or password. Try the demo credentials above."
             st.rerun()
 
     st.markdown("""<div class="feature-row">
