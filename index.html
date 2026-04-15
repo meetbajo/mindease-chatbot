@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindEase – Mental Health Chatbot | PoC Prototype</title>
+  <meta name="description" content="MindEase is an AI-powered mental health chatbot prototype that provides emotional support, mood tracking, and mental wellness guidance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- App Shell -->
+  <div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">🧠</div>
+          <div class="logo-text">
+            <span class="logo-name">MindEase</span>
+            <span class="logo-tagline">Your Mental Wellness Companion</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="chat" id="nav-chat">
+          <span class="nav-icon">💬</span>
+          <span>Chat</span>
+        </button>
+        <button class="nav-item" data-tab="mood" id="nav-mood">
+          <span class="nav-icon">📊</span>
+          <span>Mood Tracker</span>
+        </button>
+        <button class="nav-item" data-tab="resources" id="nav-resources">
+          <span class="nav-icon">📚</span>
+          <span>Resources</span>
+        </button>
+        <button class="nav-item" data-tab="crisis" id="nav-crisis">
+          <span class="nav-icon">🆘</span>
+          <span>Crisis Help</span>
+        </button>
+      </nav>
+
+      <!-- Today's Mood Quick Check -->
+      <div class="mood-quick">
+        <p class="mood-quick-label">How are you feeling?</p>
+        <div class="mood-emojis">
+          <button class="mood-emoji" data-mood="1" title="Very Sad" id="mood-btn-1">😢</button>
+          <button class="mood-emoji" data-mood="2" title="Sad" id="mood-btn-2">😕</button>
+          <button class="mood-emoji" data-mood="3" title="Neutral" id="mood-btn-3">😐</button>
+          <button class="mood-emoji" data-mood="4" title="Happy" id="mood-btn-4">🙂</button>
+          <button class="mood-emoji" data-mood="5" title="Very Happy" id="mood-btn-5">😄</button>
+        </div>
+      </div>
+
+      <!-- User Profile -->
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">Anonymous User</span>
+          <span class="user-status">● Confidential Session</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ===== CHAT TAB ===== -->
+      <section class="tab-panel active" id="tab-chat">
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="chat-bot-info">
+              <div class="bot-avatar">
+                <span>🤍</span>
+                <div class="online-dot"></div>
+              </div>
+              <div>
+                <h2 class="bot-name">Elara</h2>
+                <p class="bot-status">AI Mental Wellness Companion • Always here for you</p>
+              </div>
+            </div>
+            <div class="chat-header-actions">
+              <button class="icon-btn" id="clear-chat-btn" title="Clear chat">🗑️</button>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chat-messages">
+            <!-- Messages injected by JS -->
+          </div>
+
+          <div class="typing-indicator hidden" id="typing-indicator">
+            <div class="typing-bubble">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="quick-prompts" id="quick-prompts">
+              <button class="quick-prompt" data-prompt="I'm feeling anxious today">😰 I feel anxious</button>
+              <button class="quick-prompt" data-prompt="I can't sleep well lately">😴 Sleep issues</button>
+              <button class="quick-prompt" data-prompt="I feel very stressed and overwhelmed">😓 I'm stressed</button>
+              <button class="quick-prompt" data-prompt="I've been feeling lonely and isolated">💔 Feeling lonely</button>
+              <button class="quick-prompt" data-prompt="Can you teach me a breathing exercise?">🫁 Breathing help</button>
+            </div>
+            <div class="chat-input-row">
+              <textarea
+                id="chat-input"
+                class="chat-input"
+                placeholder="Share what's on your mind… (press Enter to send)"
+                rows="1"
+                maxlength="500"
+              ></textarea>
+              <button class="send-btn" id="send-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+            <p class="disclaimer">🔒 Conversations are private and not stored. For emergencies, call 988 (Suicide & Crisis Lifeline).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MOOD TRACKER TAB ===== -->
+      <section class="tab-panel" id="tab-mood">
+        <div class="page-header">
+          <h1>Mood Tracker</h1>
+          <p>Visualize your emotional journey over the past week</p>
+        </div>
+
+        <div class="mood-dashboard">
+          <div class="mood-chart-card card">
+            <h3>This Week's Mood</h3>
+            <canvas id="mood-chart" width="600" height="200"></canvas>
+          </div>
+
+          <div class="mood-stats-row">
+            <div class="stat-card card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-value" id="avg-mood">3.6</div>
+              <div class="stat-label">Avg Mood (7d)</div>
+            </div>
+            <div class="stat-card card">
+              <div class="stat-icon">🔥</div>
+              <div class="stat-value" id="streak-days">4</div>
+              <div class="stat-label">Day Streak</div>
+            </div>
+            <div class="stat-card card">
+              <div class="stat-icon">💬</div>
+              <div class="stat-value" id="sessions-count">12</div>
+              <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-card card">
+              <div class="stat-icon">🌟</div>
+              <div class="stat-value" id="best-day">Wed</div>
+              <div class="stat-label">Best Day</div>
+            </div>
+          </div>
+
+          <div class="mood-log card">
+            <h3>Mood History</h3>
+            <div class="mood-log-list" id="mood-log-list">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+
+          <div class="mood-insight card">
+            <div class="insight-icon">💡</div>
+            <div class="insight-text">
+              <h4>Weekly Insight</h4>
+              <p>Your mood tends to dip on Mondays and peak mid-week. Try starting Mondays with a 5-minute gratitude journal to boost your baseline mood.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== RESOURCES TAB ===== -->
+      <section class="tab-panel" id="tab-resources">
+        <div class="page-header">
+          <h1>Wellness Resources</h1>
+          <p>Curated tools and techniques for your mental health journey</p>
+        </div>
+
+        <div class="resources-grid">
+          <div class="resource-card card" id="resource-breathing">
+            <div class="resource-icon">🫁</div>
+            <h3>Breathing Exercises</h3>
+            <p>The 4-7-8 technique and box breathing to calm your nervous system instantly.</p>
+            <div class="breathing-demo">
+              <div class="breath-circle" id="breath-circle">
+                <span id="breath-text">Tap to Start</span>
+              </div>
+              <div class="breath-phase" id="breath-phase"></div>
+            </div>
+          </div>
+
+          <div class="resource-card card" id="resource-journal">
+            <div class="resource-icon">📓</div>
+            <h3>Daily Journal Prompt</h3>
+            <p>Reflective writing helps process emotions and build self-awareness.</p>
+            <div class="journal-prompt-box">
+              <p class="journal-prompt-text" id="journal-prompt">Loading a prompt for you…</p>
+              <button class="btn-secondary" id="new-prompt-btn">New Prompt ↻</button>
+            </div>
+          </div>
+
+          <div class="resource-card card" id="resource-cbt">
+            <div class="resource-icon">🧩</div>
+            <h3>CBT Techniques</h3>
+            <p>Cognitive Behavioral Therapy exercises to reframe negative thoughts.</p>
+            <ul class="cbt-list">
+              <li>✅ Thought Record — Challenge negative beliefs</li>
+              <li>✅ Behavioral Activation — Break the avoidance cycle</li>
+              <li>✅ Gratitude Practice — Shift focus to positives</li>
+              <li>✅ Progressive Muscle Relaxation</li>
+            </ul>
+          </div>
+
+          <div class="resource-card card" id="resource-mindfulness">
+            <div class="resource-icon">🧘</div>
+            <h3>Mindfulness Guide</h3>
+            <p>Simple mindfulness exercises to anchor you in the present moment.</p>
+            <div class="technique-tabs">
+              <button class="tech-tab active" id="tech-54321">5-4-3-2-1</button>
+              <button class="tech-tab" id="tech-bodyscan">Body Scan</button>
+              <button class="tech-tab" id="tech-visualize">Visualize</button>
+            </div>
+            <div class="technique-content" id="technique-content">
+              <strong>The 5-4-3-2-1 Grounding Technique</strong><br/>
+              Name 5 things you see → 4 you feel → 3 you hear → 2 you smell → 1 you taste. This anchors you to the present.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== CRISIS TAB ===== -->
+      <section class="tab-panel" id="tab-crisis">
+        <div class="page-header crisis-header">
+          <h1>🆘 Crisis Support</h1>
+          <p>You are not alone. Help is always available — reach out immediately.</p>
+        </div>
+
+        <div class="crisis-alert">
+          <span class="crisis-alert-icon">⚠️</span>
+          <div>
+            <strong>If you're in immediate danger, call emergency services (112 / 911) right now.</strong>
+            <p>This chatbot is not a substitute for professional help during a crisis.</p>
+          </div>
+        </div>
+
+        <div class="crisis-grid">
+          <div class="crisis-card card" id="crisis-india">
+            <div class="crisis-flag">🇮🇳</div>
+            <h3>India Helplines</h3>
+            <div class="helpline-list">
+              <div class="helpline">
+                <span class="helpline-name">iCall (TISS)</span>
+                <a href="tel:9152987821" class="helpline-number">📞 9152987821</a>
+              </div>
+              <div class="helpline">
+                <span class="helpline-name">Vandrevala Foundation</span>
+                <a href="tel:18602662345" class="helpline-number">📞 1860-2662-345</a>
+              </div>
+              <div class="helpline">
+                <span class="helpline-name">NIMHANS</span>
+                <a href="tel:080-46110007" class="helpline-number">📞 080-46110007</a>
+              </div>
+              <div class="helpline">
+                <span class="helpline-name">Snehi</span>
+                <a href="tel:044-24640050" class="helpline-number">📞 044-24640050</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="crisis-card card" id="crisis-global">
+            <div class="crisis-flag">🌍</div>
+            <h3>Global Resources</h3>
+            <div class="helpline-list">
+              <div class="helpline">
+                <span class="helpline-name">988 Suicide & Crisis (USA)</span>
+                <a href="tel:988" class="helpline-number">📞 988</a>
+              </div>
+              <div class="helpline">
+                <span class="helpline-name">Crisis Text Line</span>
+                <span class="helpline-number">💬 Text HOME to 741741</span>
+              </div>
+              <div class="helpline">
+                <span class="helpline-name">Samaritans (UK)</span>
+                <a href="tel:116123" class="helpline-number">📞 116 123</a>
+              </div>
+              <div class="helpline">
+                <span class="helpline-name">Befrienders Worldwide</span>
+                <span class="helpline-number">🌐 befrienders.org</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="crisis-card card crisis-self-help" id="crisis-self">
+            <div class="crisis-flag">🛡️</div>
+            <h3>Right Now, Try This</h3>
+            <div class="self-help-steps">
+              <div class="self-step">
+                <span class="step-num">1</span>
+                <p>Take 5 slow, deep breaths — inhale for 4 seconds, exhale for 6.</p>
+              </div>
+              <div class="self-step">
+                <span class="step-num">2</span>
+                <p>Ground yourself: name 5 things you can see around you.</p>
+              </div>
+              <div class="self-step">
+                <span class="step-num">3</span>
+                <p>Call someone you trust — a friend, family member, or therapist.</p>
+              </div>
+              <div class="self-step">
+                <span class="step-num">4</span>
+                <p>Open the chat with Elara — talk through what you're feeling.</p>
+              </div>
+            </div>
+            <button class="btn-primary" id="go-to-chat" style="margin-top:1rem">💬 Talk to Elara Now</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
