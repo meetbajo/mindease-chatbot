@@ -265,6 +265,13 @@ hr { border-color: rgba(255,255,255,0.08) !important; }
 """, unsafe_allow_html=True)
 
 # ── SESSION STATE ──────────────────────────────────────────────────────────────
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "login_error" not in st.session_state:
+    st.session_state.login_error = ""
+if "logged_in_user" not in st.session_state:
+    st.session_state.logged_in_user = ""
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
@@ -287,6 +294,159 @@ if "journal_idx" not in st.session_state:
 
 if "breath_running" not in st.session_state:
     st.session_state.breath_running = False
+
+# ── DEMO CREDENTIALS ─────────────────────────────────────────────────────────
+DEMO_USERS = {
+    "demo":    {"password": "mindease123",  "name": "Demo User",    "avatar": "🧑"},
+    "student": {"password": "student@2024", "name": "Student User", "avatar": "🎓"},
+    "admin":   {"password": "admin@mind",   "name": "Admin",        "avatar": "🛡️"},
+}
+
+# ── LOGIN PAGE ────────────────────────────────────────────────────────────────
+if not st.session_state.logged_in:
+    # Hide sidebar on login page
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"] { display: none !important; }
+    .block-container { max-width: 460px !important; padding-top: 4rem !important; }
+
+    /* Login card */
+    .login-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 24px;
+        padding: 2.5rem 2.2rem;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        margin: 0 auto;
+    }
+    .login-logo {
+        font-family: 'Outfit', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #a89cf8, #f178b6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        line-height: 1.1;
+        margin-bottom: 0.2rem;
+    }
+    .login-sub {
+        text-align: center;
+        font-size: 0.82rem;
+        color: rgba(240,238,255,0.45);
+        margin-bottom: 2rem;
+    }
+    .demo-pill {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: rgba(124,106,247,0.15);
+        border: 1px solid rgba(124,106,247,0.3);
+        border-radius: 20px;
+        padding: 0.4rem 1rem;
+        font-size: 0.78rem;
+        color: #a89cf8;
+        cursor: pointer;
+        margin: 0.25rem;
+        transition: all 0.2s;
+    }
+    .demo-pill:hover {
+        background: rgba(124,106,247,0.28);
+        transform: translateY(-1px);
+    }
+    .login-error {
+        background: rgba(239,68,68,0.12);
+        border: 1px solid rgba(239,68,68,0.3);
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        font-size: 0.83rem;
+        color: #fca5a5;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    .feature-row {
+        display: flex; gap: 0.5rem; flex-wrap: wrap;
+        justify-content: center; margin: 1.2rem 0 0;
+    }
+    .feature-chip {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 20px;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.73rem;
+        color: rgba(240,238,255,0.5);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Centered login card
+    st.markdown('<div class="login-card">', unsafe_allow_html=True)
+    st.markdown('<div class="login-logo">🧠 MindEase</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-sub">Your AI Mental Wellness Companion<br/>Sign in to continue your journey 💜</div>', unsafe_allow_html=True)
+
+    # Demo credentials hint
+    st.markdown("""
+    <div style="background:rgba(124,106,247,0.08);border:1px solid rgba(124,106,247,0.2);
+         border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.2rem;font-size:0.8rem">
+        <strong style="color:#a89cf8">🎓 Demo Credentials</strong><br/>
+        <div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.3rem">
+            <span style="color:rgba(240,238,255,0.7)">👤 Username: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">demo</code> &nbsp; Password: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">mindease123</code></span>
+            <span style="color:rgba(240,238,255,0.7)">🎓 Username: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">student</code> &nbsp; Password: <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px">student@2024</code></span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Username input
+    username = st.text_input(
+        "👤 Username",
+        placeholder="Enter username",
+        key="login_username"
+    )
+    # Password input
+    password = st.text_input(
+        "🔒 Password",
+        placeholder="Enter password",
+        type="password",
+        key="login_password"
+    )
+
+    # Error message
+    if st.session_state.login_error:
+        st.markdown(f'<div class="login-error">⚠️ {st.session_state.login_error}</div>', unsafe_allow_html=True)
+
+    # Login button
+    if st.button("Sign In →", key="login_btn", use_container_width=True):
+        uname = username.strip().lower()
+        if uname in DEMO_USERS and DEMO_USERS[uname]["password"] == password:
+            st.session_state.logged_in = True
+            st.session_state.logged_in_user = DEMO_USERS[uname]["name"]
+            st.session_state.login_error = ""
+            # Personalize first message
+            st.session_state.messages = [
+                {
+                    "role": "assistant",
+                    "content": f"Welcome back, **{DEMO_USERS[uname]['name']}** {DEMO_USERS[uname]['avatar']} 💜\n\nI'm **Elara**, your AI mental wellness companion. This is a **safe, confidential space** for you.\n\n*How are you feeling today?*",
+                    "time": datetime.now().strftime("%I:%M %p")
+                }
+            ]
+            st.rerun()
+        elif not uname:
+            st.session_state.login_error = "Please enter a username."
+            st.rerun()
+        else:
+            st.session_state.login_error = "Invalid username or password. Try the demo credentials above."
+            st.rerun()
+
+    st.markdown("""<div class="feature-row">
+        <span class="feature-chip">💬 AI Chat</span>
+        <span class="feature-chip">📊 Mood Tracker</span>
+        <span class="feature-chip">🫁 Breathing</span>
+        <span class="feature-chip">🆘 Crisis Help</span>
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown('<div style="text-align:center;font-size:0.67rem;color:rgba(240,238,255,0.25);margin-top:1.5rem">🔒 Secure Demo • Not a substitute for professional care</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.stop()  # Stop rendering rest of app until logged in
 
 # ── CHATBOT RESPONSES ─────────────────────────────────────────────────────────
 RESPONSES = [
@@ -430,11 +590,16 @@ CBT_TECHNIQUES = [
 ]
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR
+# SIDEBAR  (only shown when logged in)
 # ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
     st.markdown('<p class="mindease-logo">🧠 MindEase</p>', unsafe_allow_html=True)
     st.markdown('<p class="mindease-tagline">Your Mental Wellness Companion</p>', unsafe_allow_html=True)
+    # Welcome user
+    st.markdown(f"""<div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.2);
+        border-radius:10px;padding:0.6rem 0.9rem;font-size:0.8rem;margin-bottom:0.5rem">
+        👋 Welcome, <strong>{st.session_state.logged_in_user}</strong>
+    </div>""", unsafe_allow_html=True)
     st.markdown("---")
 
     tab_choice = st.radio(
@@ -473,6 +638,12 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("🔒 *Conversations are private and secure.*")
     st.markdown("🆘 **Emergency:** Call **112**")
+    st.markdown("")
+    if st.button("🚪 Log Out", key="logout_btn", use_container_width=True):
+        st.session_state.logged_in = False
+        st.session_state.logged_in_user = ""
+        st.session_state.messages = []
+        st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN CONTENT
